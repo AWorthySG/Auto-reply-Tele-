@@ -17,7 +17,8 @@ async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     if message is None or chat is None or message.text is None:
         return
 
-    chat_row = db.ensure_chat(chat.id, chat.title or (chat.full_name if hasattr(chat, "full_name") else None))
+    title = chat.title or getattr(chat, "full_name", None)
+    chat_row = db.ensure_chat(chat.id, title)
     text = message.text
 
     reply_type = None

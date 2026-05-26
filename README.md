@@ -64,6 +64,18 @@ See `.env.example`. Key variables:
 - `ANTHROPIC_MODEL` — defaults to `claude-haiku-4-5-20251001` (fast + cheap).
 - `DATABASE_PATH` — SQLite file path (default `bot.db`).
 
+## Development
+
+```bash
+.venv/bin/pip install -r requirements-dev.txt
+.venv/bin/ruff check .     # lint
+.venv/bin/pytest -q        # tests
+```
+
+CI (GitHub Actions, `.github/workflows/ci.yml`) runs ruff + pytest on every push
+and pull request. Tests cover config parsing, rule matching, the SQLite layer,
+and the auto-reply handler (no live token required).
+
 ## Project layout
 
 ```

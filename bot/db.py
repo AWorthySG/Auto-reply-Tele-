@@ -135,7 +135,8 @@ def log_message(
     conn = get_conn()
     with conn:
         conn.execute(
-            "INSERT INTO messages (chat_id, user_id, username, text, ts, was_auto_replied, reply_type) "
+            "INSERT INTO messages "
+            "(chat_id, user_id, username, text, ts, was_auto_replied, reply_type) "
             "VALUES (?, ?, ?, ?, ?, ?, ?)",
             (chat_id, user_id, username, text, time.time(), int(was_auto_replied), reply_type),
         )
