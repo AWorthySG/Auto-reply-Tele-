@@ -1,0 +1,40 @@
+# systemd unit for the Telegram auto-reply userbot.
+#
+# Install:
+#   1. Put the project at /opt/auto-reply-tele and create the venv:
+#        cd /opt/auto-reply-tele
+#        python -m venv .venv && .venv/bin/pip install -r requirements.txt
+#   2. Create .env and config.yaml, then run `.venv/bin/python login.py` ONCE
+#      (as the same User below) so autoreply.session exists.
+#   3. Edit the User/paths below if yours differ, then:
+#        sudo cp deploy/autoreply.service /etc/systemd/system/
+#        sudo systemctl daemon-reload
+#        sudo systemctl enable --now autoreply
+#   4. Logs: journalctl -u autoreply -f
+
+[Unit]
+Description=Telegram auto-reply userbot
+After=network-online.target
+Wants=network-online.target
+# If it crash-loops (e.g. an invalid session), stop after 5 failures in 60s
+# instead of restarting forever.
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=autoreply
+WorkingDirectory=/opt/auto-reply-tele
+ExecStart=/opt/auto-reply-tele/.venv/bin/python -m autoreply.main
+Restart=on-failure
+RestartSec=5
+
+# Hardening (optional but recommended).
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/opt/auto-reply-tele
+
+[Install]
+WantedBy=multi-user.target

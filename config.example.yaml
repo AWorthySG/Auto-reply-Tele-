@@ -1,0 +1,49 @@
+# Auto-reply configuration.
+# Copy this file to "config.yaml" and edit it. config.yaml is gitignored.
+
+# Only auto-reply when you've been inactive (haven't sent a message yourself
+# from this account) for a while. This is what makes it an "away" responder.
+away:
+  enabled: true
+  # Consider yourself "away" after this many minutes with no outgoing activity.
+  inactivity_minutes: 15
+
+# After auto-replying to a chat, stay silent to that chat for this long.
+# Prevents reply loops and spamming the same person.
+cooldown:
+  minutes: 240
+
+# Auto-reply to 1:1 private chats.
+private_chats:
+  enabled: true
+
+# Auto-reply in groups/supergroups.
+groups:
+  enabled: true
+  # STRONGLY RECOMMENDED: only reply when you are @mentioned or someone replies
+  # to one of your messages. Replying to every group message will spam the group
+  # and can get your account flagged/banned.
+  only_when_mentioned: true
+
+# Keyword rules, evaluated top to bottom. The FIRST rule whose keywords match
+# the incoming message (case-insensitive substring match) wins.
+rules:
+  - keywords: ["price", "pricing", "cost", "quote", "how much"]
+    reply: "Thanks for asking about pricing! I'm away right now but I'll send details as soon as I'm back."
+  - keywords: ["meeting", "call", "available", "schedule", "appointment"]
+    reply: "I'm away at the moment. Drop a couple of times that work for you and I'll confirm when I'm back."
+  - keywords: ["urgent", "asap", "emergency"]
+    reply: "I see this is urgent. I'm currently away from my phone but will get to it the moment I'm back."
+
+# Used when no rule matches. Set to null (or remove) to stay silent unless a
+# keyword rule matches.
+default_reply: "Hi! I'm away right now and will reply as soon as I can."
+
+# Optional text appended to every auto-reply (e.g. to make it clear it's automated).
+# Set to "" or null to disable.
+signature: "\n\n(automated reply)"
+
+# Never auto-reply to these users or chats.
+ignore:
+  user_ids: []
+  chat_ids: []
