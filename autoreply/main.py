@@ -25,11 +25,15 @@ log = logging.getLogger("autoreply")
 
 DEFAULT_CONFIG_PATH = "config.yaml"
 EXAMPLE_CONFIG_PATH = "config.example.yaml"
-STATE_PATH = "state.json"
+DEFAULT_STATE_PATH = "state.json"
 
 
 def _resolve_config_path() -> str:
     return os.environ.get("CONFIG_PATH") or DEFAULT_CONFIG_PATH
+
+
+def _resolve_state_path() -> str:
+    return os.environ.get("STATE_PATH") or DEFAULT_STATE_PATH
 
 
 def _load_config_with_fallback(path: str) -> tuple[Config, str]:
@@ -52,10 +56,11 @@ def _load_config_with_fallback(path: str) -> tuple[Config, str]:
 # --------------------------------------------------------------------------
 def run_dry_run(config: Config) -> int:
     now = 100_000.0
-    away = State(path=STATE_PATH, last_self_activity=now - 3600, last_reply={})
-    active = State(path=STATE_PATH, last_self_activity=now - 30, last_reply={})
+    state_path = _resolve_state_path()
+    away = State(path=state_path, last_self_activity=now - 3600, last_reply={})
+    active = State(path=state_path, last_self_activity=now - 30, last_reply={})
 
-    cooled = State(path=STATE_PATH, last_self_activity=now - 3600, last_reply={})
+    cooled = State(path=state_path, last_self_activity=now - 3600, last_reply={})
     cooled.record_reply(chat_id=1, now=now - 60)
 
     samples: list[tuple[str, IncomingMessage, State]] = [
@@ -112,7 +117,7 @@ async def run_live(config: Config) -> int:
         log.error("TELEGRAM_API_ID and TELEGRAM_API_HASH must be set (see .env.example).")
         return 1
 
-    state = State.load(STATE_PATH, now=time.time())
+    state = State.load(_resolve_state_path(), now=time.time())
     # Track ids of messages WE auto-send so they don't count as "user activity".
     sent_ids: set[int] = set()
     sent_order: deque[int] = deque(maxlen=2000)

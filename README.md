@@ -76,7 +76,8 @@ python -m autoreply.main
 ```
 
 Leave it running on a machine that stays on (your always-on PC, a Raspberry Pi,
-or a small VPS). When you stop it, auto-replies stop.
+or a small VPS). When you stop it, auto-replies stop. For an unattended
+deployment that restarts itself, see **Deployment** below.
 
 ### Try it without connecting (dry run)
 
@@ -100,6 +101,41 @@ See `config.example.yaml` — every option is commented. Key ones:
 | `default_reply` | Used when no rule matches; set to `null` to stay silent. |
 | `signature` | Optional text appended to every reply. |
 | `ignore.user_ids` / `ignore.chat_ids` | Never auto-reply these. |
+
+## Deployment
+
+The bot only runs while its process is alive, so for real use run it under a
+supervisor that restarts it on crashes/reboots. Two ready-made options:
+
+### systemd (VPS / Linux host)
+
+1. Place the project at `/opt/auto-reply-tele`, create the venv, and add `.env`
+   + `config.yaml`.
+2. Log in once **as the service user** so the session file exists:
+   `sudo -u autoreply /opt/auto-reply-tele/.venv/bin/python login.py`
+3. Install the unit (edit the `User`/paths inside first if needed):
+   ```bash
+   sudo cp deploy/autoreply.service /etc/systemd/system/
+   sudo systemctl daemon-reload
+   sudo systemctl enable --now autoreply
+   journalctl -u autoreply -f      # watch logs
+   ```
+
+### Docker
+
+Secrets come from `.env`; `config.yaml` is bind-mounted read-only so you can
+edit it on the host; the login session + state persist in a named volume.
+
+```bash
+cp .env.example .env                         # fill in API id/hash
+cp config.example.yaml config.yaml           # then edit your rules
+docker compose run --rm autoreply python login.py   # one-time interactive login
+docker compose up -d                         # start (auto-restarts)
+docker compose logs -f                        # watch logs
+```
+
+The one-time login writes the session into the `autoreply-data` volume, so it
+survives restarts and rebuilds and only needs to be done once.
 
 ## Development
 

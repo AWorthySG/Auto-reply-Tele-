@@ -4,6 +4,7 @@
 *.session-journal
 state.json
 config.yaml
+data/
 
 # Python
 __pycache__/
